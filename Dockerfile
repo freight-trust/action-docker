@@ -1,6 +1,5 @@
 FROM scratch
-
-RUN curl -O https://partner-images.canonical.com/core/focal/current/ubuntu-focal-core-cloudimg-amd64-root.tar.gz /
+ADD ubuntu-focal-core-cloudimg-amd64-root.tar.gz /
 # verify that the APT lists files do not exist
 RUN [ -z "$(apt-get indextargets)" ]
 # (see https://bugs.launchpad.net/cloud-images/+bug/1699913)
@@ -40,28 +39,4 @@ RUN set -xe \
 # See: https://github.com/systemd/systemd/blob/aa0c34279ee40bce2f9681b496922dedbadfca19/src/basic/virt.c#L434
 RUN mkdir -p /run/systemd && echo 'docker' > /run/systemd/container
 
-RUN sudo apt-get install -y java-common build-essential software-properties-common curl wget openssl ssh-agent ntp || true
-
-# RUN sudo apt-get --assume-yes install ntp || true
-
-RUN sudo sed -i '/^server/d' /etc/ntp.conf
-RUN sudo tee -a /etc/ntp.conf << EOF \
-			server time1.google.com iburst \
-			server time2.google.com iburst \
-			server time3.google.com iburst \
-			server time4.google.com iburst \
-			EOF
-
-RUN sudo systemctl restart ntp &> /dev/null || true
-RUN sudo systemctl restart ntpd &> /dev/null || true
-RUN sudo service ntp restart &> /dev/null || true
-RUN sudo service ntpd restart &> /dev/null || true
-RUN sudo restart ntp &> /dev/null || true
-RUN sudo restart ntpd &> /dev/null || true \
-			ntpq -p
-
-COPY entrypoint.sh /entrypoint.sh
-
 CMD ["/bin/bash"]
-
-# ENTRYPOINT ["/entrypoint.sh"]
