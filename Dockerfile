@@ -1,10 +1,6 @@
 FROM scratch
 
-ADD curl.sh /root/curl.sh
-RUN chmod +x /root/curl.sh
-RUN sh /root/curl.sh
-
-ADD ubuntu-focal-core-cloudimg-amd64-root.tar.gz /
+RUN curl -O https://partner-images.canonical.com/core/focal/current/ubuntu-focal-core-cloudimg-amd64-root.tar.gz /
 # verify that the APT lists files do not exist
 RUN [ -z "$(apt-get indextargets)" ]
 # (see https://bugs.launchpad.net/cloud-images/+bug/1699913)
